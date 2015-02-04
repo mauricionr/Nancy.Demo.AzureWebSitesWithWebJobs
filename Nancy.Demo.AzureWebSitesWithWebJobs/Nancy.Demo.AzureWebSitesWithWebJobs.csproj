@@ -80,6 +80,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App\Views\home.html" />
     <Content Include="App\Views\shell.html" />
     <Content Include="Content\durandal.css" />
     <Content Include="Content\images\icon.png" />
@@ -124,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="App\main.ts" />
+    <TypeScriptCompile Include="App\ViewModels\home.ts" />
     <TypeScriptCompile Include="App\ViewModels\shell.ts" />
     <TypeScriptCompile Include="Scripts\typings\durandal\durandal.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
