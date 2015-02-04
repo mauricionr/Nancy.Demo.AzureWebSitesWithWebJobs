@@ -1,0 +1,5 @@
+﻿class ShellViewModel {
+
+}
+
+export = ShellViewModel;
