@@ -50,6 +50,11 @@ class HomeViewModel {
         });
     }
 
+    updateImage(img: Models.Image): void {
+        $("#image-gallery-title").text(img.title());
+        $("#image-gallery-image").attr("src", img.source());
+    }
+
     gotoPrevious(): void {
         var that = this;
         that.gotoPage(that.currentPage() - 1);

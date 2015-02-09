@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls.WebParts;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
@@ -14,10 +15,16 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
     public class Bootstrapper : Nancy.DefaultNancyBootstrapper
     {
         private readonly CloudTable _table;
+        private readonly CloudBlobClient _blobClient;
 
         public Bootstrapper()
         {
             var storage = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["storage"].ConnectionString);
+
+            // Blob
+            _blobClient = storage.CreateCloudBlobClient();
+
+            // Table
             var tableClient = storage.CreateCloudTableClient();
             _table = tableClient.GetTableReference("storage");   
         }
@@ -27,6 +34,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
             pipelines.BeforeRequest.AddItemToStartOfPipeline(Nancy.Security.SecurityHooks.RequiresHttps(true));
             InitTableStorage();
             container.Register<Repositories.ImageRepository>();
+            container.Register(_blobClient);
             container.Register(_table);
 
             base.ApplicationStartup(container, pipelines);

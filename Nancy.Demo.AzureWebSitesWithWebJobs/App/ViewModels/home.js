@@ -36,6 +36,10 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
                 that.images(images());
             });
         };
+        HomeViewModel.prototype.updateImage = function (img) {
+            $("#image-gallery-title").text(img.title());
+            $("#image-gallery-image").attr("src", img.source());
+        };
         HomeViewModel.prototype.gotoPrevious = function () {
             var that = this;
             that.gotoPage(that.currentPage() - 1);

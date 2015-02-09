@@ -3,7 +3,7 @@
     <div class="col-lg-12" data-bind="foreach: images">
 
         <div class="col-lg-3 col-md-4 col-xs-6 thumb">
-            <a class="thumbnail" href="#" data-toggle="modal" data-bind="attr: { 'data-image-id': id, 'data-title': title, 'data-caption': title, 'data-image': source }" data-target="#image-gallery">
+            <a class="thumbnail" href="#" data-toggle="modal" data-bind="click: function(data) { $root.updateImage(data); }, attr: { 'data-image-id': id, 'data-title': title, 'data-caption': title, 'data-image': source }" data-target="#image-gallery">
                 <img class="img-responsive" data-bind="attr: { src: thumbnail, 'alt': title }">
             </a>
         </div>
@@ -32,12 +32,6 @@
             <!-- /ko -->
             <li data-bind="css: { 'disabled': $root.currentPage() == ($root.imageCount()-1) }"><a href="#" data-bind="click: function() { $root.gotoNext(); }" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
         </ul>
-        <!--<ul>
-                <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-                <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
-                <li><a href="#">2 <span class="sr-only">(current)</span></a></li>
-                <li><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
-            </ul>-->
     </div>
 </div>
 
@@ -49,21 +43,7 @@
                 <h4 class="modal-title" id="image-gallery-title"></h4>
             </div>
             <div class="modal-body">
-                <img id="image-gallery-image" class="img-responsive" src="">
-            </div>
-            <div class="modal-footer">
-
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-primary" id="show-previous-image">Previous</button>
-                </div>
-
-                <div class="col-md-8 text-justify" id="image-gallery-caption">
-                    This text will be overwritten by jQuery
-                </div>
-
-                <div class="col-md-2">
-                    <button type="button" id="show-next-image" class="btn btn-default">Next</button>
-                </div>
+                <img id="image-gallery-image" class="img-responsive" src="" alt="">
             </div>
         </div>
     </div>
