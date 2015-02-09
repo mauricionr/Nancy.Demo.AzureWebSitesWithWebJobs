@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,17 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Api.Images
             if (imageRepository == null) throw new ArgumentNullException("imageRepository");
             _imageRepository = imageRepository;
 
+            Get["count", true] = GetImageCount;
             Get["{count:int}/{offset:int}", true] = GetImages;
+        }
+
+        private async Task<object> GetImageCount(object arg1, CancellationToken arg2)
+        {
+            var count = await _imageRepository.GetImageCountAsync();
+            return new Models.ImageCountResponse
+            {
+                ImageCount = count
+            };
         }
 
         private async Task<dynamic> GetImages(dynamic parameters, CancellationToken arg2)

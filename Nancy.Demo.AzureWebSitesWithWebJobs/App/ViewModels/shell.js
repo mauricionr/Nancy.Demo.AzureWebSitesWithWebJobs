@@ -6,8 +6,7 @@ define(["require", "exports", 'plugins/router'], function (require, exports, rou
         ShellViewModel.prototype.activate = function () {
             router.map([
                 { route: '', title: 'Home', moduleId: 'viewmodels/home', nav: true },
-                { route: 'about', title: 'About', moduleId: 'viewmodels/about', nav: true },
-                { route: 'contact', title: 'Contact', moduleId: 'viewmodels/contact', nav: true }
+                { route: 'about', title: 'About', moduleId: 'viewmodels/about', nav: true }
             ]).buildNavigationModel();
             return router.activate();
         };

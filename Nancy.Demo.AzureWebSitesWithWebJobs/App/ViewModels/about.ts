@@ -1,0 +1,5 @@
+﻿class AboutViewModel {
+
+}
+
+export = AboutViewModel;

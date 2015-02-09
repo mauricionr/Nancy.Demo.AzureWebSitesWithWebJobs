@@ -5,13 +5,28 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
         function HomeViewModel() {
             var that = this;
             that.router = router;
+            that.pages = ko.observableArray([]);
+            that.currentPage = ko.observable(1);
             that.images = ko.observableArray([]);
-            that.imageIndex = ko.observable(0);
+            that.imageCount = ko.observable(0);
             that.loading = ko.observable(true);
         }
         HomeViewModel.prototype.activate = function () {
             var that = this;
-            return that.getImages(0);
+            return http.get("/api/images/list/count").done(function (response) {
+                if (response.imageCount < 1)
+                    response.imageCount = 1;
+                var pages = Math.floor(response.imageCount / 12);
+                //if (response.imageCount % 12 > 0)
+                //    pages++;
+                var pageArray = [];
+                for (var i = 1; i <= pages; i++) {
+                    pageArray.push(i);
+                }
+                that.pages(pageArray);
+                that.imageCount(response.imageCount);
+                return that.getImages(0);
+            });
         };
         HomeViewModel.prototype.getImages = function (offset) {
             var that = this;
@@ -21,7 +36,20 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
                 that.images(images());
             });
         };
-        HomeViewModel.prototype.compositionComplete = function (view) {
+        HomeViewModel.prototype.gotoPrevious = function () {
+            var that = this;
+            that.gotoPage(that.currentPage() - 1);
+        };
+        HomeViewModel.prototype.gotoNext = function () {
+            var that = this;
+            that.gotoPage(that.currentPage() + 1);
+        };
+        HomeViewModel.prototype.gotoPage = function (index) {
+            var that = this;
+            if (index > that.pages().length)
+                index = that.pages().length;
+            that.currentPage(index);
+            that.getImages(index * 12);
         };
         return HomeViewModel;
     })();

@@ -9,5 +9,6 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Interfaces
     public interface IImageRepository
     {
         Task<IReadOnlyCollection<Models.Image>> GetImagesAsync(int count, int offset);
+        Task<int> GetImageCountAsync();
     }
 }

@@ -111,6 +111,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App\Views\about.html" />
     <Content Include="App\Views\home.html" />
     <Content Include="App\Views\shell.html" />
     <Content Include="Content\durandal.css" />
@@ -142,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Images\ListModule.cs" />
+    <Compile Include="Api\Images\Models\ImageCountResponse.cs" />
     <Compile Include="Infrastructure\Bootstrapper.cs" />
     <Compile Include="Infrastructure\Startup.cs" />
     <Compile Include="Interfaces\IImageRepository.cs" />
@@ -163,6 +165,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="App\main.ts" />
     <TypeScriptCompile Include="App\Models\Image.ts" />
+    <TypeScriptCompile Include="App\ViewModels\about.ts" />
     <TypeScriptCompile Include="App\ViewModels\home.ts" />
     <TypeScriptCompile Include="App\ViewModels\shell.ts" />
     <TypeScriptCompile Include="Scripts\typings\durandal\durandal.d.ts" />
