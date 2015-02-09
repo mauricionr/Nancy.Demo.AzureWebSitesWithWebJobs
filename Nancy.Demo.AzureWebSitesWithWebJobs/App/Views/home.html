@@ -8,19 +8,17 @@
             </a>
         </div>
         <!-- ko if: ($index % 3 === 0) -->
-        <div data-bind="template: { name: 'gallery-break' }"></div>
+        <div data-bind="template: { name: 'gallery-break', afterRender: function(elements) { $root.galleryBreak(elements); } }"></div>
         <!-- /ko -->
     </div>
     <!-- ko if: (images().length === 0) -->
     <p>No images available</p>
     <!-- /ko -->
-
-
 </div>
 
 <div class="row">
     <div class="col-md-12 text-center">
-        <button class="btn btn-primary">Upload</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#image-upload">Upload</button>
     </div>
 </div>
 <div class="row">
@@ -34,8 +32,7 @@
         </ul>
     </div>
 </div>
-
-<div class="modal fade" id="image-gallery" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="image-gallery" tabindex="-1" role="dialog" aria-labelledby="modal-gallery" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -49,7 +46,18 @@
     </div>
 </div>
 
-<script type="text/html" id="gallery-break">
+<div class="modal fade" id="image-upload" tabindex="-1" role="dialog" aria-labelledby="modal-upload" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Upload image</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/api/images/upload/" id="uploadForm" class="dropzone" method="post" enctype="multipart/form-data"></form>
+            </div>
+        </div>
     </div>
-    <div class="col-lg-12">
-</script>
+</div>
+
+

@@ -120,11 +120,14 @@
     <Content Include="App\Views\about.html" />
     <Content Include="App\Views\home.html" />
     <Content Include="App\Views\shell.html" />
+    <Content Include="Content\basic.min.css" />
+    <Content Include="Content\dropzone.min.css" />
     <Content Include="Content\durandal.css" />
     <Content Include="Content\images\icon.png" />
     <Content Include="Content\images\ios-startup-image-landscape.png" />
     <Content Include="Content\images\ios-startup-image-portrait.png" />
     <Content Include="img\big-ajax-loader.gif" />
+    <Content Include="Scripts\dropzone-amd-module.min.js" />
     <Content Include="Scripts\durandal\activator.js" />
     <Content Include="Scripts\durandal\app.js" />
     <Content Include="Scripts\durandal\binder.js" />
@@ -177,10 +180,12 @@
     <TypeScriptCompile Include="App\ViewModels\about.ts" />
     <TypeScriptCompile Include="App\ViewModels\home.ts" />
     <TypeScriptCompile Include="App\ViewModels\shell.ts" />
+    <TypeScriptCompile Include="Scripts\typings\dropzone\dropzone.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\durandal\durandal.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout.mapping\knockout.mapping.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout\knockout.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\mine\dropzone.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\requirejs\require.d.ts" />
   </ItemGroup>
   <ItemGroup />

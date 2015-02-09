@@ -1,6 +1,7 @@
 /// <reference path="../../scripts/typings/knockout.mapping/knockout.mapping.d.ts" />
 /// <reference path="../models/image.ts" />
-define(["require", "exports", 'plugins/router', 'plugins/http'], function (require, exports, router, http) {
+/// <reference path="../../scripts/typings/dropzone/dropzone.d.ts" />
+define(["require", "exports", 'plugins/router', 'plugins/http', 'dropzone'], function (require, exports, router, http, Dropzone) {
     var HomeViewModel = (function () {
         function HomeViewModel() {
             var that = this;
@@ -9,6 +10,7 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
             that.currentPage = ko.observable(1);
             that.images = ko.observableArray([]);
             that.imageCount = ko.observable(0);
+            that.dropzoneLoaded = ko.observable(false);
             that.loading = ko.observable(true);
         }
         HomeViewModel.prototype.activate = function () {
@@ -17,8 +19,6 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
                 if (response.imageCount < 1)
                     response.imageCount = 1;
                 var pages = Math.floor(response.imageCount / 12);
-                //if (response.imageCount % 12 > 0)
-                //    pages++;
                 var pageArray = [];
                 for (var i = 1; i <= pages; i++) {
                     pageArray.push(i);
@@ -27,6 +27,24 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
                 that.imageCount(response.imageCount);
                 return that.getImages(0);
             });
+        };
+        HomeViewModel.prototype.compositionComplete = function () {
+            var that = this;
+            $('#image-upload').on('shown.bs.modal', function () {
+                if (that.dropzoneLoaded())
+                    return;
+                that.dropzoneLoaded(true);
+                var myDropzone = new Dropzone("#uploadForm");
+            });
+            //, { 
+            //    thumbnailWidth: 80,
+            //    thumbnailHeight: 80,
+            //    parallelUploads: 20,
+            //    previewTemplate: previewTemplate,
+            //    autoQueue: false, // Make sure the files aren't queued until manually added
+            //    previewsContainer: "#previews", // Define the container to display the previews
+            //    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
+            //});
         };
         HomeViewModel.prototype.getImages = function (offset) {
             var that = this;
@@ -50,6 +68,8 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
         };
         HomeViewModel.prototype.gotoPage = function (index) {
             var that = this;
+            if (index === that.currentPage())
+                return;
             if (index > that.pages().length)
                 index = that.pages().length;
             that.currentPage(index);

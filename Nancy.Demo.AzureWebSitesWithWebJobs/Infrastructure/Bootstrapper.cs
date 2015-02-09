@@ -15,14 +15,15 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
     public class Bootstrapper : Nancy.DefaultNancyBootstrapper
     {
         private readonly CloudTable _table;
-        private readonly CloudBlobClient _blobClient;
+        private readonly CloudBlobContainer _blobContainer;
 
         public Bootstrapper()
         {
             var storage = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["storage"].ConnectionString);
 
             // Blob
-            _blobClient = storage.CreateCloudBlobClient();
+            var blobClient = storage.CreateCloudBlobClient();
+            _blobContainer = blobClient.GetContainerReference("upload");
 
             // Table
             var tableClient = storage.CreateCloudTableClient();
@@ -31,10 +32,11 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
-            pipelines.BeforeRequest.AddItemToStartOfPipeline(Nancy.Security.SecurityHooks.RequiresHttps(true));
             InitTableStorage();
+
+            pipelines.BeforeRequest.AddItemToStartOfPipeline(Nancy.Security.SecurityHooks.RequiresHttps(true));
             container.Register<Repositories.ImageRepository>();
-            container.Register(_blobClient);
+            container.Register(_blobContainer);
             container.Register(_table);
 
             base.ApplicationStartup(container, pipelines);
@@ -43,6 +45,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
         private void InitTableStorage()
         {
             _table.CreateIfNotExists();
+            _blobContainer.CreateIfNotExists();
         }
     }
 }

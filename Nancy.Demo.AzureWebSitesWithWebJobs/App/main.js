@@ -3,7 +3,8 @@ requirejs.config({
         'text': '/Scripts/text',
         'durandal': '/Scripts/durandal',
         'plugins': '/Scripts/durandal/plugins',
-        'transitions': '/Scripts/durandal/transitions'
+        'transitions': '/Scripts/durandal/transitions',
+        'dropzone': '/Scripts/dropzone-amd-module.min'
     }
 });
 define('jquery', function () { return jQuery; });

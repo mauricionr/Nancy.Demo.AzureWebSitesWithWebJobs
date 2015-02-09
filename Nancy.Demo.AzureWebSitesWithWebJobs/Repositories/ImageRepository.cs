@@ -26,9 +26,14 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
         public Task<IReadOnlyCollection<Models.Image>> GetImagesAsync(int count, int offset)
         {
             var images = new List<Models.Image>(TotalCount);
+            var rnd = new Random();
             for (var i = 0; i < TotalCount; i++)
             {
-                var img = new Models.Image("Id-" + i, "Title " + i, "//placehold.it/350x150", "//placehold.it/1024x768");
+                var thumbnailHeight = rnd.Next(300, 350);
+                var thumbnailWidth = rnd.Next(150, 200);
+                var height = rnd.Next(1024, 1920);
+                var width = rnd.Next(768, 1440);
+                var img = new Models.Image("Id-" + i, "Title " + i, "//placehold.it/" + thumbnailWidth + "x" + thumbnailHeight, "//placehold.it/" + width + "x" + height);
                 images.Add(img);
             }
 
