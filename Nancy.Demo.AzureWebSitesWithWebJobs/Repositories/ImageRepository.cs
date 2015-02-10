@@ -65,7 +65,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
 
             var uri = new Uri(storageUrl);
             var id = Path.GetFileNameWithoutExtension(uri.AbsolutePath);
-            var img = new Common.Entities.Image { PartitionKey = "uploaded", RowKey = Guid.NewGuid().ToString("N"), Id = id };
+            var img = new Common.Entities.Image { PartitionKey = Guid.NewGuid().ToString("N"), RowKey = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), Id = id };
             var message = JsonConvert.SerializeObject(img);
             var queueMessage = new CloudQueueMessage(message);
             await _queue.AddMessageAsync(queueMessage);

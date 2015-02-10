@@ -39,14 +39,10 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
             log.WriteLine("Created full image for " + img.Id);
 
             // Insert to table storage
-            var imgEntry = new Image
-            {
-                PartitionKey = img.RowKey,
-                RowKey = img.RowKey,
-                Source = outputBlob.Uri.AbsolutePath,
-                Thumbnail = outputThumbnailBlob.Uri.AbsolutePath
-            };
-            var opp = TableOperation.Insert(imgEntry);
+            img.Source = outputBlob.Uri.AbsolutePath;
+            img.Thumbnail = outputThumbnailBlob.Uri.AbsolutePath;
+
+            var opp = TableOperation.Insert(img);
             imageTable.Execute(opp);
             log.WriteLine("Inserted outputted image for " + img.Id);
         }
