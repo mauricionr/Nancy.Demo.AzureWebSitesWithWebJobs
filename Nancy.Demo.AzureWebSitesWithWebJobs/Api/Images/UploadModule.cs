@@ -19,7 +19,24 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Api.Images
             if (imageRepository == null) throw new ArgumentNullException("imageRepository");
             _imageRepository = imageRepository;
 
+            Get["url", true] = GetImageUploadUrl;
+            Post["complete", true] = ImageUploadComplete;
             Post["", true] = UploadImage;
+        }
+
+        private async Task<object> ImageUploadComplete(object arg1, CancellationToken arg2)
+        {
+            var request = this.BindAndValidate<Models.UploadCompleteRequest>();
+            if (!ModelValidationResult.IsValid)
+                return HttpStatusCode.BadRequest;
+
+            return HttpStatusCode.NoContent;
+        }
+
+        private async Task<object> GetImageUploadUrl(object arg1, CancellationToken arg2)
+        {
+            var url = await _imageRepository.GetImageUploadUrlAsync();
+            return url;
         }
 
         private async Task<object> UploadImage(object parameters, CancellationToken arg2)

@@ -120,14 +120,11 @@
     <Content Include="App\Views\about.html" />
     <Content Include="App\Views\home.html" />
     <Content Include="App\Views\shell.html" />
-    <Content Include="Content\basic.min.css" />
-    <Content Include="Content\dropzone.min.css" />
-    <Content Include="Content\durandal.css" />
+    <Content Include="Content\main.css" />
     <Content Include="Content\images\icon.png" />
     <Content Include="Content\images\ios-startup-image-landscape.png" />
     <Content Include="Content\images\ios-startup-image-portrait.png" />
     <Content Include="img\big-ajax-loader.gif" />
-    <Content Include="Scripts\dropzone-amd-module.min.js" />
     <Content Include="Scripts\durandal\activator.js" />
     <Content Include="Scripts\durandal\app.js" />
     <Content Include="Scripts\durandal\binder.js" />
@@ -144,6 +141,7 @@
     <Content Include="Scripts\durandal\transitions\entrance.js" />
     <Content Include="Scripts\durandal\viewEngine.js" />
     <Content Include="Scripts\durandal\viewLocator.js" />
+    <Content Include="Scripts\knockout.files.js" />
     <Content Include="Scripts\r.js" />
     <Content Include="Scripts\text.js" />
     <Content Include="Web.config">
@@ -153,6 +151,7 @@
   <ItemGroup>
     <Compile Include="Api\Images\ListModule.cs" />
     <Compile Include="Api\Images\Models\ImageCountResponse.cs" />
+    <Compile Include="Api\Images\Models\UploadCompleteRequest.cs" />
     <Compile Include="Api\Images\Models\UploadRequest.cs" />
     <Compile Include="Api\Images\UploadModule.cs" />
     <Compile Include="Entities\Image.cs" />
@@ -180,15 +179,16 @@
     <TypeScriptCompile Include="App\ViewModels\about.ts" />
     <TypeScriptCompile Include="App\ViewModels\home.ts" />
     <TypeScriptCompile Include="App\ViewModels\shell.ts" />
-    <TypeScriptCompile Include="Scripts\typings\dropzone\dropzone.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\durandal\durandal.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery.fileupload\jquery.fileupload.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout.mapping\knockout.mapping.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout\knockout.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\mine\dropzone.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\requirejs\require.d.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Scripts\typings\mine\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

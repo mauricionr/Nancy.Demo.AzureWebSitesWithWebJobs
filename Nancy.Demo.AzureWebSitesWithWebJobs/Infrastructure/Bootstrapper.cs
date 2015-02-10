@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls.WebParts;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage.Shared.Protocol;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nancy.Bootstrapper;
 using Nancy.Conventions;
@@ -14,6 +15,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
 {
     public class Bootstrapper : Nancy.DefaultNancyBootstrapper
     {
+        private readonly CloudBlobClient _blobClient;
         private readonly CloudTable _table;
         private readonly CloudBlobContainer _blobContainer;
 
@@ -22,12 +24,12 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
             var storage = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["storage"].ConnectionString);
 
             // Blob
-            var blobClient = storage.CreateCloudBlobClient();
-            _blobContainer = blobClient.GetContainerReference("upload");
+            _blobClient = storage.CreateCloudBlobClient();
+            _blobContainer = _blobClient.GetContainerReference("upload");
 
             // Table
             var tableClient = storage.CreateCloudTableClient();
-            _table = tableClient.GetTableReference("storage");   
+            _table = tableClient.GetTableReference("storage");
         }
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
@@ -39,13 +41,37 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
             container.Register(_blobContainer);
             container.Register(_table);
 
+            pipelines.AfterRequest += PostRequest;
+
             base.ApplicationStartup(container, pipelines);
+        }
+
+        private void PostRequest(NancyContext ctx)
+        {
+            ctx.Response.WithHeader("Access-Control-Allow-Origin", "https://" + _blobContainer.Uri.Host);
         }
 
         private void InitTableStorage()
         {
+            var blobProperties = _blobClient.GetServiceProperties();
+            ConfigureCors(blobProperties);
+            _blobClient.SetServiceProperties(blobProperties);
+
             _table.CreateIfNotExists();
-            _blobContainer.CreateIfNotExists();
+            _blobContainer.CreateIfNotExists(BlobContainerPublicAccessType.Blob);
+        }
+
+        private static void ConfigureCors(ServiceProperties serviceProperties)
+        {
+            serviceProperties.Cors = new CorsProperties();
+            serviceProperties.Cors.CorsRules.Add(new CorsRule
+            {
+                AllowedHeaders = new List<string>() { "*" },
+                AllowedMethods = CorsHttpMethods.Put | CorsHttpMethods.Get | CorsHttpMethods.Head | CorsHttpMethods.Post,
+                AllowedOrigins = new List<string>() { "*" },
+                ExposedHeaders = new List<string>() { "*" },
+                MaxAgeInSeconds = 1800 // 30 minutes
+            });
         }
     }
 }

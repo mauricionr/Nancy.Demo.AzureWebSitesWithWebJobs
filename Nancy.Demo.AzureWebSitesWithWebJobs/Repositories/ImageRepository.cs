@@ -15,6 +15,8 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
         private readonly CloudTable _table;
         private readonly CloudBlobContainer _blobContainer;
 
+        public string StorageDomain { get { return _blobContainer.Uri.Host; } }
+
         public ImageRepository(CloudTable table, Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer blobContainer)
         {
             if (table == null) throw new ArgumentNullException("table");
@@ -63,6 +65,24 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             var insertTask = _table.ExecuteAsync(operation);
 
             await Task.WhenAll(uploadTask, insertTask);
+        }
+
+        public Task<string> GetImageUploadUrlAsync()
+        {
+            var id = Guid.NewGuid().ToString("N");
+            var path = "uploaded/" + id;
+            var blob = _blobContainer.GetBlockBlobReference(path);
+            var sasConstraints = new SharedAccessBlobPolicy
+            {
+                SharedAccessStartTime = DateTime.UtcNow.AddMinutes(-5),
+                SharedAccessExpiryTime = DateTime.UtcNow.AddHours(4),
+                Permissions = SharedAccessBlobPermissions.Read | SharedAccessBlobPermissions.Write
+            };
+
+            //Generate the shared access signature on the blob, setting the constraints directly on the signature.
+            var sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
+            var url = blob.Uri.AbsoluteUri + sasBlobToken;
+            return Task.FromResult(url);
         }
     }
 }

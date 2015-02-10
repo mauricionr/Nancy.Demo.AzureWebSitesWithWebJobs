@@ -1,7 +1,7 @@
+/// <reference path="../../scripts/typings/jquery.fileupload/jquery.fileupload.d.ts" />
 /// <reference path="../../scripts/typings/knockout.mapping/knockout.mapping.d.ts" />
 /// <reference path="../models/image.ts" />
-/// <reference path="../../scripts/typings/dropzone/dropzone.d.ts" />
-define(["require", "exports", 'plugins/router', 'plugins/http', 'dropzone'], function (require, exports, router, http, Dropzone) {
+define(["require", "exports", 'plugins/router', 'plugins/http'], function (require, exports, router, http) {
     var HomeViewModel = (function () {
         function HomeViewModel() {
             var that = this;
@@ -31,10 +31,43 @@ define(["require", "exports", 'plugins/router', 'plugins/http', 'dropzone'], fun
         HomeViewModel.prototype.compositionComplete = function () {
             var that = this;
             $('#image-upload').on('shown.bs.modal', function () {
+                $("#image-container").empty();
                 if (that.dropzoneLoaded())
                     return;
                 that.dropzoneLoaded(true);
-                var myDropzone = new Dropzone("#uploadForm");
+                //$("#fileupload").fileupload({
+                //    dataType: 'json',
+                //    acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                //    maxFileSize: 5000000, // 5 MB
+                //    // Enable image resizing, except for Android and Opera,
+                //    // which actually support image resizing, but fail to
+                //    // send Blob objects via XHR requests:
+                //    disableImageResize: /Android(?!.*Chrome)|Opera/
+                //        .test(window.navigator.userAgent),
+                //    previewMaxWidth: 100,
+                //    previewMaxHeight: 100,
+                //    previewCrop: true,
+                //    type: 'PUT',
+                //    add: (e, data) => {
+                //        $.get("/api/images/upload/url").done(url => {
+                //            data.url = url;
+                //            data.headers = {
+                //                "x-ms-blob-type": "BlockBlob"
+                //                //"Content-type": data.files[0].type
+                //            };
+                //            data.submit();
+                //        });
+                //    },
+                //    progressall: (e, data) => {
+                //        var loaded: number = data.loaded;
+                //        var total: number = data.total;
+                //        var progress = loaded / total * 100;
+                //        $('#progress .progress-bar').css(
+                //            'width',
+                //            progress + '%'
+                //            );
+                //    }
+                //});
             });
             //, { 
             //    thumbnailWidth: 80,
@@ -45,6 +78,52 @@ define(["require", "exports", 'plugins/router', 'plugins/http', 'dropzone'], fun
             //    previewsContainer: "#previews", // Define the container to display the previews
             //    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
             //});
+        };
+        HomeViewModel.prototype.fileLoaded = function (file, data) {
+            var that = this;
+            // add preview
+            var img = $(document.createElement("img"));
+            img.attr("src", data);
+            img.addClass("preview");
+            $("#image-container").append(img);
+            // Start upload
+            var reader = new FileReader();
+            reader.onloadend = that.imageLoaded(file);
+            reader.readAsArrayBuffer(file);
+        };
+        HomeViewModel.prototype.imageLoaded = function (file) {
+            var that = this;
+            return (function (theFile) { return function (e) {
+                $.get("/api/images/upload/url").done(function (url) {
+                    that.uploadImage(url, e.target.result);
+                });
+            }; })(file);
+        };
+        HomeViewModel.prototype.uploadImage = function (url, data) {
+            var that = this;
+            var ajaxRequest = new XMLHttpRequest();
+            try {
+                ajaxRequest.open('PUT', url, true);
+                ajaxRequest.setRequestHeader('Content-Type', 'image/jpeg');
+                ajaxRequest.setRequestHeader('x-ms-blob-type', 'BlockBlob');
+                ajaxRequest.send(data);
+                that.reportImageUploaded(url);
+            }
+            catch (e) {
+                alert("can't upload the image to server.\n" + e.toString());
+            }
+        };
+        HomeViewModel.prototype.reportImageUploaded = function (url) {
+            var uri = "/api/images/upload/complete";
+            var bag = {
+                storageUrl: url
+            };
+            $.ajax(uri, {
+                data: bag,
+                dataType: "json",
+                type: "post"
+            }).done(function () {
+            });
         };
         HomeViewModel.prototype.getImages = function (offset) {
             var that = this;

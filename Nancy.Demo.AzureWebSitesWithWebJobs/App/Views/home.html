@@ -51,13 +51,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title">Upload image</h4>
+                <h4 class="modal-title">Upload images</h4>
             </div>
             <div class="modal-body">
-                <form action="/api/images/upload/" id="uploadForm" class="dropzone" method="post" enctype="multipart/form-data"></form>
+                <input id="fileupload" type="file" name="files[]" multiple="multiple" data-bind="files: { onLoaded: function(file, data) { fileLoaded(file, data); }, fileFilter: 'image.*' }" />
+
+                <div id="image-container"></div>
             </div>
         </div>
     </div>
 </div>
-
-
