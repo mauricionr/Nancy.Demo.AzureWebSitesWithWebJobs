@@ -55,12 +55,17 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
         {
             var format = new PngFormat { Quality = quality };
             var maxSize = new Size(maxWidth, 0);
-            using (var imageFactory = new ImageFactory(preserveExifData: true))
+            using (var memoryOutput = new MemoryStream())
             {
-                imageFactory.Load(input)
-                            .Resize(maxSize)
-                            .Format(format)
-                            .Save(output);
+                using (var imageFactory = new ImageFactory(preserveExifData: true))
+                {
+                    imageFactory.Load(input)
+                                .Resize(maxSize)
+                                .Format(format)
+                                .Save(memoryOutput);
+                }
+                memoryOutput.Seek(0, SeekOrigin.Begin);
+                memoryOutput.CopyTo(output);
             }
         }
     }

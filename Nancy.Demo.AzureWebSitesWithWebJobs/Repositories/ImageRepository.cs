@@ -13,7 +13,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
 {
     public class ImageRepository : Interfaces.IImageRepository
     {
-        private const int TotalCount = 241;
+        private const int TotalCount = 7;
         private readonly CloudTable _table;
         private readonly CloudBlobContainer _blobContainer;
         private readonly CloudQueue _queue;
@@ -96,8 +96,8 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
                 throw new ArgumentNullException("storageUrl");
 
             var uri = new Uri(storageUrl);
-            var path = uri.AbsolutePath;
-            var img = new Common.Entities.Image { PartitionKey = "uploaded", RowKey = Guid.NewGuid().ToString("N"), Source = path };
+            var id = Path.GetFileNameWithoutExtension(uri.AbsolutePath);
+            var img = new Common.Entities.Image { PartitionKey = "uploaded", RowKey = Guid.NewGuid().ToString("N"), Id = id };
             var message = JsonConvert.SerializeObject(img);
             var queueMessage = new CloudQueueMessage(message);
             await _queue.AddMessageAsync(queueMessage);
