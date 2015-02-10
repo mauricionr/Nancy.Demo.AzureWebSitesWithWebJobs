@@ -9,6 +9,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Api.Images.Models
     public class UploadCompleteRequest
     {
         public string StorageUrl { get; set; }
+        public string ContentType { get; set; }
     }
 
     public class UploadCompleteRequestValidator : AbstractValidator<UploadCompleteRequest>
@@ -16,6 +17,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Api.Images.Models
         public UploadCompleteRequestValidator()
         {
             RuleFor(ucr => ucr.StorageUrl).NotNull().NotEmpty();
+            RuleFor(ucr => ucr.ContentType).NotNull().NotEmpty();
         }
     }
 }

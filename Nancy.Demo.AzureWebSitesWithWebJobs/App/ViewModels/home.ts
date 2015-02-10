@@ -69,31 +69,32 @@ class HomeViewModel {
         var that = this;
         return (theFile => e => {
             $.get("/api/images/upload/url").done(url => {
-                that.uploadImage(url, e.target.result);
+                that.uploadImage(url, file.type, e.target.result);
             });
         })(file);
     }
 
-    private uploadImage(url: string, data): void {
+    private uploadImage(url: string, contentType: string, data): void {
         var that = this;
         var ajaxRequest = new XMLHttpRequest();
 
         try {
             ajaxRequest.open('PUT', url, true);
-            ajaxRequest.setRequestHeader('Content-Type', 'image/jpeg');
+            ajaxRequest.setRequestHeader('Content-Type', contentType);
             ajaxRequest.setRequestHeader('x-ms-blob-type', 'BlockBlob');
             ajaxRequest.send(data);
-            that.reportImageUploaded(url);
+            that.reportImageUploaded(contentType, url);
         }
         catch (e) {
             alert("can't upload the image to server.\n" + e.toString());
         }
     }
 
-    private reportImageUploaded(url: string): void {
+    private reportImageUploaded(contentType: string, url: string): void {
         var uri = "/api/images/upload/complete";
         var bag = {
-            storageUrl: url
+            storageUrl: url,
+            contentType: contentType
         };
         $.ajax(uri, {
             data: bag,

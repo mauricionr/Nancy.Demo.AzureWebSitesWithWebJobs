@@ -12,6 +12,6 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Interfaces
         Task<IReadOnlyCollection<Models.Image>> GetImagesAsync(int count, int offset);
         Task<int> GetImageCountAsync();
         Task<string> GetImageUploadUrlAsync();
-        Task ImageUploadCompleteAsync(string storageUrl);
+        Task ImageUploadCompleteAsync(string contentType, string storageUrl);
     }
 }

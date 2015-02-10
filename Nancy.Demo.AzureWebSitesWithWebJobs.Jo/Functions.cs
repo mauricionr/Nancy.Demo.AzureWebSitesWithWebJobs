@@ -30,12 +30,12 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
 
             using (var output = outputThumbnailBlob.OpenWrite())
             {
-                ProcessImage(input, output, quality: 70, maxWidth: 150);
+                ProcessImage(img.ContentType, input, output, quality: 70, maxWidth: 150);
             }
             log.WriteLine("Created thumbnail for " + img.Id);
             using (var output = outputBlob.OpenWrite())
             {
-                ProcessImage(input, output, quality: 100, maxWidth: 1920);
+                ProcessImage(img.ContentType, input, output, quality: 100, maxWidth: 1920);
             }
             log.WriteLine("Created full image for " + img.Id);
 
@@ -48,9 +48,13 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
             log.WriteLine("Inserted outputted image for " + img.Id);
         }
 
-        private static void ProcessImage(Stream input, Stream output, int quality, int maxWidth)
+        private static void ProcessImage(string contentType, Stream input, Stream output, int quality, int maxWidth)
         {
-            var format = new PngFormat { Quality = quality };
+            ISupportedImageFormat format = new JpegFormat { Quality = quality };
+            if (contentType == "image/gif")
+                format = new GifFormat { Quality = quality };
+            if (contentType == "image/png")
+                format = new PngFormat { Quality = quality };
             var maxSize = new Size(maxWidth, 0);
             var resize = new ResizeLayer(maxSize, ResizeMode.Max, AnchorPosition.Center, false, null, maxSize);
             using (var memoryOutput = new MemoryStream())

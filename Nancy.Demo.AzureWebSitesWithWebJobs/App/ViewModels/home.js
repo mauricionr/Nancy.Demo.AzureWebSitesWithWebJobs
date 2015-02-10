@@ -52,28 +52,29 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
             var that = this;
             return (function (theFile) { return function (e) {
                 $.get("/api/images/upload/url").done(function (url) {
-                    that.uploadImage(url, e.target.result);
+                    that.uploadImage(url, file.type, e.target.result);
                 });
             }; })(file);
         };
-        HomeViewModel.prototype.uploadImage = function (url, data) {
+        HomeViewModel.prototype.uploadImage = function (url, contentType, data) {
             var that = this;
             var ajaxRequest = new XMLHttpRequest();
             try {
                 ajaxRequest.open('PUT', url, true);
-                ajaxRequest.setRequestHeader('Content-Type', 'image/jpeg');
+                ajaxRequest.setRequestHeader('Content-Type', contentType);
                 ajaxRequest.setRequestHeader('x-ms-blob-type', 'BlockBlob');
                 ajaxRequest.send(data);
-                that.reportImageUploaded(url);
+                that.reportImageUploaded(contentType, url);
             }
             catch (e) {
                 alert("can't upload the image to server.\n" + e.toString());
             }
         };
-        HomeViewModel.prototype.reportImageUploaded = function (url) {
+        HomeViewModel.prototype.reportImageUploaded = function (contentType, url) {
             var uri = "/api/images/upload/complete";
             var bag = {
-                storageUrl: url
+                storageUrl: url,
+                contentType: contentType
             };
             $.ajax(uri, {
                 data: bag,

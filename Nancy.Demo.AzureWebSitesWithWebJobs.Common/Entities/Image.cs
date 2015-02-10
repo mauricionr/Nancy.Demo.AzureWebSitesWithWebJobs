@@ -8,5 +8,6 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Common.Entities
         public string Id { get; set; }
         public string Thumbnail { get; set; }
         public string Source { get; set; }
+        public string ContentType { get; set; }
     }
 }

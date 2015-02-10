@@ -59,14 +59,16 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             return Task.FromResult(url);
         }
 
-        public async Task ImageUploadCompleteAsync(string storageUrl)
+        public async Task ImageUploadCompleteAsync(string contentType, string storageUrl)
         {
+            if (string.IsNullOrEmpty(contentType))
+                throw new ArgumentNullException("contentType");
             if (string.IsNullOrEmpty(storageUrl))
                 throw new ArgumentNullException("storageUrl");
 
             var uri = new Uri(storageUrl);
             var id = Path.GetFileNameWithoutExtension(uri.AbsolutePath);
-            var img = new Common.Entities.Image { PartitionKey = Guid.NewGuid().ToString("N"), RowKey = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), Id = id };
+            var img = new Common.Entities.Image { PartitionKey = Guid.NewGuid().ToString("N"), RowKey = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), Id = id, ContentType = contentType };
             var message = JsonConvert.SerializeObject(img);
             var queueMessage = new CloudQueueMessage(message);
             await _queue.AddMessageAsync(queueMessage);
