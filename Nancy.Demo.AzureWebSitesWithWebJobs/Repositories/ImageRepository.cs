@@ -29,8 +29,9 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
 
         public async Task<IReadOnlyCollection<Models.Image>> GetImagesAsync(int count, int offset)
         {
+            var urlPrefix = "https://" + _blobContainer.Uri.Host;
             var list = await GetImageList();
-            var result = list.Skip(offset).Take(count).Select(i => new Models.Image(i.Id, i.Id, i.Thumbnail, i.Source)).ToList();
+            var result = list.Skip(offset).Take(count).Select(i => new Models.Image(i.Id, i.Id, urlPrefix + i.Thumbnail, urlPrefix + i.Source)).ToList();
             return result;
         }
 
