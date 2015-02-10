@@ -1,3 +1,4 @@
+/// <reference path="../../scripts/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../../scripts/typings/knockout.mapping/knockout.mapping.d.ts" />
 /// <reference path="../models/image.ts" />
 define(["require", "exports", 'plugins/router', 'plugins/http'], function (require, exports, router, http) {
@@ -18,6 +19,8 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
                 if (response.imageCount < 1)
                     response.imageCount = 1;
                 var pages = Math.floor(response.imageCount / 12);
+                if (pages < 1)
+                    pages = 1;
                 var pageArray = [];
                 for (var i = 1; i <= pages; i++) {
                     pageArray.push(i);
@@ -71,6 +74,7 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
             }
         };
         HomeViewModel.prototype.reportImageUploaded = function (contentType, url) {
+            var that = this;
             var uri = "/api/images/upload/complete";
             var bag = {
                 storageUrl: url,
@@ -81,6 +85,9 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
                 dataType: "json",
                 type: "post"
             }).done(function () {
+                $("#image-container").append("<br /><br />Done");
+                $("#image-upload").modal('hide');
+                that.getImages(0);
             });
         };
         HomeViewModel.prototype.getImages = function (offset) {
@@ -94,6 +101,7 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
         HomeViewModel.prototype.updateImage = function (img) {
             $("#image-gallery-title").text(img.title());
             $("#image-gallery-image").attr("src", img.source());
+            $("#image-gallery-link").attr("href", img.source());
         };
         HomeViewModel.prototype.gotoPrevious = function () {
             var that = this;

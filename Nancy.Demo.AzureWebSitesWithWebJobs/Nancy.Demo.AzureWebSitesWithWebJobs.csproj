@@ -179,6 +179,7 @@
     <TypeScriptCompile Include="App\ViewModels\about.ts" />
     <TypeScriptCompile Include="App\ViewModels\home.ts" />
     <TypeScriptCompile Include="App\ViewModels\shell.ts" />
+    <TypeScriptCompile Include="Scripts\typings\bootstrap\bootstrap.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\durandal\durandal.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout.mapping\knockout.mapping.d.ts" />

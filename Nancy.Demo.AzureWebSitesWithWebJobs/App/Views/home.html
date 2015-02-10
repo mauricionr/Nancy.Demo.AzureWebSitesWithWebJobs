@@ -19,6 +19,7 @@
 <div class="row">
     <div class="col-md-12 text-center">
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#image-upload">Upload</button>
+        <button type="button" class="btn btn-primary" data-bind="click: function() { $root.getImages(0); }">Refresh</button>
     </div>
 </div>
 <div class="row">
@@ -28,19 +29,19 @@
             <!-- ko foreach: pages -->
             <li data-bind="css: { 'active': $root.currentPage() == $data }"><a href="#" data-bind="text: $data, click: function() { $root.gotoPage($data); }">1</a></li>
             <!-- /ko -->
-            <li data-bind="css: { 'disabled': $root.currentPage() == ($root.imageCount()-1) }"><a href="#" data-bind="click: function() { $root.gotoNext(); }" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+            <li data-bind="css: { 'disabled': $root.currentPage() == $root.imageCount() }"><a href="#" data-bind="click: function() { $root.gotoNext(); }" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
         </ul>
     </div>
 </div>
 <div class="modal fade" id="image-gallery" tabindex="-1" role="dialog" aria-labelledby="modal-gallery" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title" id="image-gallery-title"></h4>
             </div>
             <div class="modal-body">
-                <img id="image-gallery-image" class="img-responsive" src="" alt="">
+                <a href="#" id="image-gallery-link" target="new"><img id="image-gallery-image" class="img-responsive" src="" alt=""></a>
             </div>
         </div>
     </div>
@@ -54,7 +55,7 @@
                 <h4 class="modal-title">Upload images</h4>
             </div>
             <div class="modal-body">
-                <input id="fileupload" type="file" name="files[]" multiple="multiple" data-bind="files: { onLoaded: function(file, data) { fileLoaded(file, data); }, fileFilter: 'image.*' }" />
+                <input id="fileupload" type="file" data-bind="files: { onLoaded: function(file, data) { fileLoaded(file, data); }, fileFilter: 'image.*' }" />
 
                 <div id="image-container"></div>
             </div>
