@@ -27,7 +27,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
 
             // Blob
             _blobClient = storage.CreateCloudBlobClient();
-            _blobContainer = _blobClient.GetContainerReference("upload");
+            _blobContainer = _blobClient.GetContainerReference("images");
 
             // Table
             var tableClient = storage.CreateCloudTableClient();

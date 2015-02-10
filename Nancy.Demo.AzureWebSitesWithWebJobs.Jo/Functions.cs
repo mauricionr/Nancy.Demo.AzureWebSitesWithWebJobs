@@ -19,9 +19,9 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
     {
         public static void ProcessImageQueueMessage(
             [QueueTrigger("images")] Common.Entities.Image img,
-            [Blob("{Name}", FileAccess.Read)] Stream input,
-            [Blob("handled/{BlobNameWithoutExtension}.jpg")] CloudBlockBlob outputBlob,
-            [Blob("handled/{BlobNameWithoutExtension}_thumbnail.jpg")] CloudBlockBlob outputThumbnailBlob,
+            [Blob("images/uploads/{Id}", FileAccess.Read)] Stream input,
+            [Blob("images/handled/{Id}.png")] CloudBlockBlob outputBlob,
+            [Blob("images/handled/{Id}_thumbnail.png")] CloudBlockBlob outputThumbnailBlob,
             [Table("images")]CloudTable imageTable,
             TextWriter log)
         {
@@ -31,10 +31,12 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
             {
                 ProcessImage(input, output, quality: 70, maxWidth: 150);
             }
+            log.WriteLine("Created thumbnail for " + img.Id);
             using (var output = outputBlob.OpenWrite())
             {
                 ProcessImage(input, output, quality: 100, maxWidth: 1920);
             }
+            log.WriteLine("Created full image for " + img.Id);
 
             // Insert to table storage
             var imgEntry = new Image
@@ -46,6 +48,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
             };
             var opp = TableOperation.Insert(imgEntry);
             imageTable.Execute(opp);
+            log.WriteLine("Inserted outputted image for " + img.Id);
         }
 
         private static void ProcessImage(Stream input, Stream output, int quality, int maxWidth)

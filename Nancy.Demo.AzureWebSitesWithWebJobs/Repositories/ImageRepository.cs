@@ -65,7 +65,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             var uploadTask = blob.UploadFromStreamAsync(value);
 
             // add image to table storage
-            var img = new Common.Entities.Image { PartitionKey = "uploaded", RowKey = id, Title = title, Source = path };
+            var img = new Common.Entities.Image { PartitionKey = "uploaded", RowKey = id, Id = title, Source = path };
             var operation = TableOperation.Insert(img);
             var insertTask = _table.ExecuteAsync(operation);
 
@@ -75,7 +75,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
         public Task<string> GetImageUploadUrlAsync()
         {
             var id = Guid.NewGuid().ToString("N");
-            var path = "uploaded/" + id;
+            var path = "uploads/" + id;
             var blob = _blobContainer.GetBlockBlobReference(path);
             var sasConstraints = new SharedAccessBlobPolicy
             {
