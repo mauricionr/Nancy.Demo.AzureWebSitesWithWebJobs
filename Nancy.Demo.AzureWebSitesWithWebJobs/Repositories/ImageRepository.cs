@@ -5,7 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 
 namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
 {
@@ -14,15 +16,18 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
         private const int TotalCount = 241;
         private readonly CloudTable _table;
         private readonly CloudBlobContainer _blobContainer;
+        private readonly CloudQueue _queue;
 
         public string StorageDomain { get { return _blobContainer.Uri.Host; } }
 
-        public ImageRepository(CloudTable table, Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer blobContainer)
+        public ImageRepository(CloudTable table, Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer blobContainer, Microsoft.WindowsAzure.Storage.Queue.CloudQueue queue)
         {
             if (table == null) throw new ArgumentNullException("table");
             if (blobContainer == null) throw new ArgumentNullException("blobContainer");
+            if (queue == null) throw new ArgumentNullException("queue");
             _table = table;
             _blobContainer = blobContainer;
+            _queue = queue;
         }
 
         public Task<IReadOnlyCollection<Models.Image>> GetImagesAsync(int count, int offset)
@@ -60,7 +65,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             var uploadTask = blob.UploadFromStreamAsync(value);
 
             // add image to table storage
-            var img = new Entities.Image { PartitionKey = "uploaded", RowKey = id, Title = title, Source = path };
+            var img = new Common.Entities.Image { PartitionKey = "uploaded", RowKey = id, Title = title, Source = path };
             var operation = TableOperation.Insert(img);
             var insertTask = _table.ExecuteAsync(operation);
 
@@ -83,6 +88,19 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             var sasBlobToken = blob.GetSharedAccessSignature(sasConstraints);
             var url = blob.Uri.AbsoluteUri + sasBlobToken;
             return Task.FromResult(url);
+        }
+
+        public async Task ImageUploadCompleteAsync(string storageUrl)
+        {
+            if (string.IsNullOrEmpty(storageUrl))
+                throw new ArgumentNullException("storageUrl");
+
+            var uri = new Uri(storageUrl);
+            var path = uri.AbsolutePath;
+            var img = new Common.Entities.Image { PartitionKey = "uploaded", RowKey = Guid.NewGuid().ToString("N"), Source = path };
+            var message = JsonConvert.SerializeObject(img);
+            var queueMessage = new CloudQueueMessage(message);
+            await _queue.AddMessageAsync(queueMessage);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls.WebParts;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Shared.Protocol;
 using Microsoft.WindowsAzure.Storage.Table;
 using Nancy.Bootstrapper;
@@ -18,6 +19,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
         private readonly CloudBlobClient _blobClient;
         private readonly CloudTable _table;
         private readonly CloudBlobContainer _blobContainer;
+        private readonly CloudQueue _queue;
 
         public Bootstrapper()
         {
@@ -29,17 +31,24 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
 
             // Table
             var tableClient = storage.CreateCloudTableClient();
-            _table = tableClient.GetTableReference("storage");
+            _table = tableClient.GetTableReference("images");
+
+            // queue
+            var queueClient = storage.CreateCloudQueueClient();
+            _queue = queueClient.GetQueueReference("images");
         }
 
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
             InitTableStorage();
 
+#if !DEBUG
             pipelines.BeforeRequest.AddItemToStartOfPipeline(Nancy.Security.SecurityHooks.RequiresHttps(true));
+#endif
             container.Register<Repositories.ImageRepository>();
             container.Register(_blobContainer);
             container.Register(_table);
+            container.Register(_queue);
 
             pipelines.AfterRequest += PostRequest;
 
@@ -48,7 +57,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
 
         private void PostRequest(NancyContext ctx)
         {
-            ctx.Response.WithHeader("Access-Control-Allow-Origin", "https://" + _blobContainer.Uri.Host);
+            ctx.Response.WithHeader("Access-Control-Allow-Origin", ctx.Request.Url.Scheme + "://" + _blobContainer.Uri.Host);
         }
 
         private void InitTableStorage()
@@ -59,6 +68,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
 
             _table.CreateIfNotExists();
             _blobContainer.CreateIfNotExists(BlobContainerPublicAccessType.Blob);
+            _queue.CreateIfNotExists();
         }
 
         private static void ConfigureCors(ServiceProperties serviceProperties)

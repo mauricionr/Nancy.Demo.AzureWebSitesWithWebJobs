@@ -1,5 +1,4 @@
-﻿/// <reference path="../../scripts/typings/jquery.fileupload/jquery.fileupload.d.ts" />
-/// <reference path="../../scripts/typings/knockout.mapping/knockout.mapping.d.ts" />
+﻿/// <reference path="../../scripts/typings/knockout.mapping/knockout.mapping.d.ts" />
 /// <reference path="../models/image.ts" />
 
 import router = require('plugins/router');
@@ -48,52 +47,7 @@ class HomeViewModel {
             if (that.dropzoneLoaded())
                 return;
             that.dropzoneLoaded(true);
-
-            //$("#fileupload").fileupload({
-            //    dataType: 'json',
-            //    acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-            //    maxFileSize: 5000000, // 5 MB
-            //    // Enable image resizing, except for Android and Opera,
-            //    // which actually support image resizing, but fail to
-            //    // send Blob objects via XHR requests:
-            //    disableImageResize: /Android(?!.*Chrome)|Opera/
-            //        .test(window.navigator.userAgent),
-            //    previewMaxWidth: 100,
-            //    previewMaxHeight: 100,
-            //    previewCrop: true,
-            //    type: 'PUT',
-            //    add: (e, data) => {
-            //        $.get("/api/images/upload/url").done(url => {
-            //            data.url = url;
-            //            data.headers = {
-            //                "x-ms-blob-type": "BlockBlob"
-            //                //"Content-type": data.files[0].type
-            //            };
-            //            data.submit();
-            //        });
-            //    },
-            //    progressall: (e, data) => {
-            //        var loaded: number = data.loaded;
-            //        var total: number = data.total;
-            //        var progress = loaded / total * 100;
-            //        $('#progress .progress-bar').css(
-            //            'width',
-            //            progress + '%'
-            //            );
-            //    }
-            //});
         });
-
-        
-        //, { 
-        //    thumbnailWidth: 80,
-        //    thumbnailHeight: 80,
-        //    parallelUploads: 20,
-        //    previewTemplate: previewTemplate,
-        //    autoQueue: false, // Make sure the files aren't queued until manually added
-        //    previewsContainer: "#previews", // Define the container to display the previews
-        //    clickable: ".fileinput-button" // Define the element that should be used as click trigger to select files.
-        //});
     }
 
     fileLoaded(file: any, data: any): void {

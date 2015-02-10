@@ -30,6 +30,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Api.Images
             if (!ModelValidationResult.IsValid)
                 return HttpStatusCode.BadRequest;
 
+            await _imageRepository.ImageUploadCompleteAsync(request.StorageUrl);
             return HttpStatusCode.NoContent;
         }
 

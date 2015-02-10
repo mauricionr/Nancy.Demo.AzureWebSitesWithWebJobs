@@ -14,5 +14,6 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Interfaces
         Task UploadImageAsync(string title, Stream value);
         Task<string> GetImageUploadUrlAsync();
         string StorageDomain { get; }
+        Task ImageUploadCompleteAsync(string storageUrl);
     }
 }
