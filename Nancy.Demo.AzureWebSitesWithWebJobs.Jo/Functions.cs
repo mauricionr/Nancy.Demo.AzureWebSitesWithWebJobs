@@ -21,8 +21,8 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
         public static void ProcessImageQueueMessage(
             [QueueTrigger("images")] Common.Entities.Image img,
             [Blob("images/uploads/{Id}", FileAccess.Read)] Stream input,
-            [Blob("images/handled/{Id}.png")] CloudBlockBlob outputBlob,
-            [Blob("images/handled/{Id}_thumbnail.png")] CloudBlockBlob outputThumbnailBlob,
+            [Blob("images/handled/{Id}.img")] CloudBlockBlob outputBlob,
+            [Blob("images/handled/{Id}_thumbnail.img")] CloudBlockBlob outputThumbnailBlob,
             [Table("images")]CloudTable imageTable,
             TextWriter log)
         {
@@ -31,11 +31,13 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
             using (var output = outputThumbnailBlob.OpenWrite())
             {
                 ProcessImage(img.ContentType, input, output, quality: 70, maxWidth: 150);
+                outputThumbnailBlob.Properties.ContentType = img.ContentType;
             }
             log.WriteLine("Created thumbnail for " + img.Id);
             using (var output = outputBlob.OpenWrite())
             {
-                ProcessImage(img.ContentType, input, output, quality: 100, maxWidth: 1920);
+                ProcessImage(img.ContentType, input, output, quality: 90, maxWidth: 1920);
+                outputBlob.Properties.ContentType = img.ContentType;
             }
             log.WriteLine("Created full image for " + img.Id);
 
