@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageProcessor;
+using ImageProcessor.Imaging;
 using ImageProcessor.Imaging.Formats;
 using Microsoft.Azure.WebJobs;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -51,12 +52,13 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
         {
             var format = new PngFormat { Quality = quality };
             var maxSize = new Size(maxWidth, 0);
+            var resize = new ResizeLayer(maxSize, ResizeMode.Max, AnchorPosition.Center, false, null, maxSize);
             using (var memoryOutput = new MemoryStream())
             {
                 using (var imageFactory = new ImageFactory(preserveExifData: true))
                 {
                     imageFactory.Load(input)
-                                .Resize(maxSize)
+                                .Resize(resize)
                                 .Format(format)
                                 .Save(memoryOutput);
                 }
