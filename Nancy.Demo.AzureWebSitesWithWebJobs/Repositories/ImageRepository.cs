@@ -13,12 +13,9 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
 {
     public class ImageRepository : Interfaces.IImageRepository
     {
-        private const int TotalCount = 7;
         private readonly CloudTable _table;
         private readonly CloudBlobContainer _blobContainer;
         private readonly CloudQueue _queue;
-
-        public string StorageDomain { get { return _blobContainer.Uri.Host; } }
 
         public ImageRepository(CloudTable table, Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer blobContainer, Microsoft.WindowsAzure.Storage.Queue.CloudQueue queue)
         {
@@ -30,46 +27,17 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             _queue = queue;
         }
 
-        public Task<IReadOnlyCollection<Models.Image>> GetImagesAsync(int count, int offset)
+        public async Task<IReadOnlyCollection<Models.Image>> GetImagesAsync(int count, int offset)
         {
-            var images = new List<Models.Image>(TotalCount);
-            var rnd = new Random();
-            for (var i = 0; i < TotalCount; i++)
-            {
-                var thumbnailHeight = rnd.Next(300, 350);
-                var thumbnailWidth = rnd.Next(150, 200);
-                var height = rnd.Next(1024, 1920);
-                var width = rnd.Next(768, 1440);
-                var img = new Models.Image("Id-" + i, "Title " + i, "//placehold.it/" + thumbnailWidth + "x" + thumbnailHeight, "//placehold.it/" + width + "x" + height);
-                images.Add(img);
-            }
-
-            var result = images.Skip(offset).Take(count).ToList();
-            return Task.FromResult<IReadOnlyCollection<Models.Image>>(result);
+            var list = await GetImageList();
+            var result = list.Skip(offset).Take(count).Select(i => new Models.Image(i.Id, i.Id, i.Thumbnail, i.Source)).ToList();
+            return result;
         }
 
-        public Task<int> GetImageCountAsync()
+        public async Task<int> GetImageCountAsync()
         {
-            return Task.FromResult(TotalCount);
-        }
-
-        public async Task UploadImageAsync(string title, Stream value)
-        {
-            if (string.IsNullOrEmpty(title)) throw new ArgumentNullException("title");
-            if (value == null) throw new ArgumentNullException("value");
-
-            // upload image to blob storage
-            var id = Guid.NewGuid().ToString("N");
-            var path = "uploaded/" + id;
-            var blob = _blobContainer.GetBlockBlobReference(path);
-            var uploadTask = blob.UploadFromStreamAsync(value);
-
-            // add image to table storage
-            var img = new Common.Entities.Image { PartitionKey = "uploaded", RowKey = id, Id = title, Source = path };
-            var operation = TableOperation.Insert(img);
-            var insertTask = _table.ExecuteAsync(operation);
-
-            await Task.WhenAll(uploadTask, insertTask);
+            var list = await GetImageList();
+            return list.Count;
         }
 
         public Task<string> GetImageUploadUrlAsync()
@@ -101,6 +69,20 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             var message = JsonConvert.SerializeObject(img);
             var queueMessage = new CloudQueueMessage(message);
             await _queue.AddMessageAsync(queueMessage);
+        }
+
+        private async Task<IReadOnlyCollection<Common.Entities.Image>> GetImageList()
+        {
+            var query = new TableQuery<Common.Entities.Image>();
+            var response = await _table.ExecuteQuerySegmentedAsync(query, null);
+            var list = new List<Common.Entities.Image>();
+            list.AddRange(response.Results);
+            while (response.ContinuationToken != null)
+            {
+                response = await _table.ExecuteQuerySegmentedAsync(query, response.ContinuationToken);
+                list.AddRange(response.Results);
+            }
+            return list;
         }
     }
 }
