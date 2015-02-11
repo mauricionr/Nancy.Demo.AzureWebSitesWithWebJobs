@@ -2,7 +2,7 @@
   "$schema": "http://schemastore.org/schemas/json/webjobs-list.json",
   "WebJobs": [
     {
-      "filePath": "../Nancy.Demo.AzureWebSitesWithWebJobs.Jo/Nancy.Demo.AzureWebSitesWithWebJobs.Jo.csproj"
+      "filePath": "../Nancy.Demo.AzureWebSitesWithWebJobs.Job/Nancy.Demo.AzureWebSitesWithWebJobs.Job.csproj"
     }
   ]
 }
