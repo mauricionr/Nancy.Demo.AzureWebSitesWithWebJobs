@@ -114,6 +114,7 @@ class HomeViewModel {
     getImages(offset: number): JQueryPromise<any> {
         var that = this;
         that.loading(true);
+        that.images([]);
 
         return http.get("/api/images/list/12/" + offset).done(response => {
             var images = ko.mapping.fromJS(response);

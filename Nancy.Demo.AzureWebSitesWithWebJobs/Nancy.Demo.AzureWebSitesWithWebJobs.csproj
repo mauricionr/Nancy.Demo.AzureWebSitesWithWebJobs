@@ -155,7 +155,9 @@
     <Compile Include="Api\Images\Models\UploadRequest.cs" />
     <Compile Include="Api\Images\UploadModule.cs" />
     <Compile Include="Infrastructure\Bootstrapper.cs" />
+    <Compile Include="Infrastructure\Config.cs" />
     <Compile Include="Infrastructure\Startup.cs" />
+    <Compile Include="Interfaces\IConfig.cs" />
     <Compile Include="Interfaces\IImageRepository.cs" />
     <Compile Include="Models\Image.cs" />
     <Compile Include="Modules\HomeModule.cs" />

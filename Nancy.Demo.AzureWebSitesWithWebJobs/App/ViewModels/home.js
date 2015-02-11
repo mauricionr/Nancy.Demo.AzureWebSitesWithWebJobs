@@ -93,6 +93,7 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
         HomeViewModel.prototype.getImages = function (offset) {
             var that = this;
             that.loading(true);
+            that.images([]);
             return http.get("/api/images/list/12/" + offset).done(function (response) {
                 var images = ko.mapping.fromJS(response);
                 that.images(images());

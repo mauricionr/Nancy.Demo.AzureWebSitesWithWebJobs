@@ -46,6 +46,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
             pipelines.BeforeRequest.AddItemToStartOfPipeline(Nancy.Security.SecurityHooks.RequiresHttps(true));
 #endif
             container.Register<Repositories.ImageRepository>();
+            container.Register<Infrastructure.Config>();
             container.Register(_blobContainer);
             container.Register(_table);
             container.Register(_queue);

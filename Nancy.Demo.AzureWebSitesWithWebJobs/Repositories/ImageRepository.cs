@@ -7,6 +7,7 @@ using System.Web;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
+using Nancy.Demo.AzureWebSitesWithWebJobs.Interfaces;
 using Newtonsoft.Json;
 
 namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
@@ -16,20 +17,25 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
         private readonly CloudTable _table;
         private readonly CloudBlobContainer _blobContainer;
         private readonly CloudQueue _queue;
+        private readonly IConfig _config;
 
-        public ImageRepository(CloudTable table, Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer blobContainer, Microsoft.WindowsAzure.Storage.Queue.CloudQueue queue)
+        public ImageRepository(CloudTable table, Microsoft.WindowsAzure.Storage.Blob.CloudBlobContainer blobContainer, Microsoft.WindowsAzure.Storage.Queue.CloudQueue queue, Interfaces.IConfig config)
         {
             if (table == null) throw new ArgumentNullException("table");
             if (blobContainer == null) throw new ArgumentNullException("blobContainer");
             if (queue == null) throw new ArgumentNullException("queue");
+            if (config == null) throw new ArgumentNullException("config");
             _table = table;
             _blobContainer = blobContainer;
             _queue = queue;
+            _config = config;
         }
 
         public async Task<IReadOnlyCollection<Models.Image>> GetImagesAsync(int count, int offset)
         {
-            var urlPrefix = "https://" + _blobContainer.Uri.Host;
+            var urlPrefix = "//" + _blobContainer.Uri.Host;
+            if (!string.IsNullOrEmpty(_config.StorageCdn))
+                urlPrefix = "//" + _config.StorageCdn;
             var list = await GetImageList();
             var result = list.Skip(offset).Take(count).Select(i => new Models.Image(i.Id, i.Id, urlPrefix + i.Thumbnail, urlPrefix + i.Source)).ToList();
             return result;
