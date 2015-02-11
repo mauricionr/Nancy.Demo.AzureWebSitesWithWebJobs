@@ -90,6 +90,13 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             if (img == null)
                 return;
 
+            var source = img.Source.Substring(_blobContainer.Name.Length + 2);
+            var blob = _blobContainer.GetBlockBlobReference(source);
+            await blob.DeleteIfExistsAsync();
+            source = img.Thumbnail.Substring(_blobContainer.Name.Length + 2);
+            blob = _blobContainer.GetBlockBlobReference(source);
+            await blob.DeleteIfExistsAsync();
+
             var opp = TableOperation.Delete(img);
             await _table.ExecuteAsync(opp);
         }
