@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImageProcessor;
 using ImageProcessor.Imaging;
 using ImageProcessor.Imaging.Formats;
 using Microsoft.Azure.WebJobs;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
-using Nancy.Demo.AzureWebSitesWithWebJobs.Common.Entities;
-using Image = Nancy.Demo.AzureWebSitesWithWebJobs.Common.Entities.Image;
 
-namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
+namespace Nancy.Demo.AzureWebSitesWithWebJobs.Job
 {
     public class Functions
     {
@@ -32,12 +25,14 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Jo
             {
                 ProcessImage(img.ContentType, input, output, quality: 70, maxWidth: 150);
                 outputThumbnailBlob.Properties.ContentType = img.ContentType;
+                outputThumbnailBlob.Properties.CacheControl = "public, max-age=31536000"; // 1 year cache
             }
             log.WriteLine("Created thumbnail for " + img.Id);
             using (var output = outputBlob.OpenWrite())
             {
                 ProcessImage(img.ContentType, input, output, quality: 90, maxWidth: 1920);
                 outputBlob.Properties.ContentType = img.ContentType;
+                outputBlob.Properties.CacheControl = "public, max-age=31536000"; // 1 year cache
             }
             log.WriteLine("Created full image for " + img.Id);
 
