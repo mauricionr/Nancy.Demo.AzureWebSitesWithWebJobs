@@ -7,8 +7,8 @@
     <ProjectGuid>{1992BE7B-3BD9-4C7F-87B6-CD5F0E6F6E9A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nancy.Demo.AzureWebSitesWithWebJobs.Jo</RootNamespace>
-    <AssemblyName>Nancy.Demo.AzureWebSitesWithWebJobs.Jo</AssemblyName>
+    <RootNamespace>Nancy.Demo.AzureWebSitesWithWebJobs.Job</RootNamespace>
+    <AssemblyName>Nancy.Demo.AzureWebSitesWithWebJobs.Job</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
