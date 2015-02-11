@@ -13,5 +13,6 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Interfaces
         Task<int> GetImageCountAsync();
         Task<string> GetImageUploadUrlAsync();
         Task ImageUploadCompleteAsync(string contentType, string storageUrl);
+        Task DeleteImageAsync(string id);
     }
 }

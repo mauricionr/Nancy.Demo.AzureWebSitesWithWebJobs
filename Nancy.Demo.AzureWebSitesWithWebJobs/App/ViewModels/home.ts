@@ -147,6 +147,18 @@ class HomeViewModel {
         that.currentPage(index);
         that.getImages(index * 12);
     }
+
+    deleteImage(image: Models.Image): void {
+        var that = this;
+        that.loading(true);
+        var url = "/api/images/delete";
+        var bag = {
+            imageId: image.id()
+        };
+        http.post(url, bag).always(() => {
+            that.getImages(0);
+        });
+    }
 }
 
 export = HomeViewModel;

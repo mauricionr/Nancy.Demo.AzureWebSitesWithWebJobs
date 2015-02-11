@@ -1,3 +1,15 @@
+.previewContainer {
+    border: 2px solid #f4f4f4;
+    background-color: #FCFCFC;
+    padding: 10px;
+}
+
 .preview {
     max-width: 100px;
+}
+
+.loader {
+    width: 100%;
+    height: 100%;
+    background-color: #f0f8ff;
 }

@@ -80,6 +80,20 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Repositories
             await _queue.AddMessageAsync(queueMessage);
         }
 
+        public async Task DeleteImageAsync(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentNullException("id");
+
+            var images = await GetImageList();
+            var img = images.FirstOrDefault(i => i.Id == id);
+            if (img == null)
+                return;
+
+            var opp = TableOperation.Delete(img);
+            await _table.ExecuteAsync(opp);
+        }
+
         private async Task<IReadOnlyCollection<Common.Entities.Image>> GetImageList()
         {
             var query = new TableQuery<Common.Entities.Image>();

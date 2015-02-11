@@ -121,6 +121,17 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
             that.currentPage(index);
             that.getImages(index * 12);
         };
+        HomeViewModel.prototype.deleteImage = function (image) {
+            var that = this;
+            that.loading(true);
+            var url = "/api/images/delete";
+            var bag = {
+                imageId: image.id()
+            };
+            http.post(url, bag).always(function () {
+                that.getImages(0);
+            });
+        };
         return HomeViewModel;
     })();
     return HomeViewModel;

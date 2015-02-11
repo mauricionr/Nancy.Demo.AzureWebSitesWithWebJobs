@@ -149,7 +149,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\Images\DeleteModule.cs" />
     <Compile Include="Api\Images\ListModule.cs" />
+    <Compile Include="Api\Images\Models\DeleteImageRequest.cs" />
     <Compile Include="Api\Images\Models\ImageCountResponse.cs" />
     <Compile Include="Api\Images\Models\UploadCompleteRequest.cs" />
     <Compile Include="Api\Images\Models\UploadRequest.cs" />
