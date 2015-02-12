@@ -14,6 +14,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
     {
         public void Configuration(IAppBuilder app)
         {
+            app.MapSignalR();
             app.UseNancy();
         }
     }
