@@ -13,7 +13,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Job
     {
         public static void ProcessImageQueueMessage(
             [QueueTrigger("images")] Common.Entities.Image img,
-            [Blob("images/uploads/{Id}", FileAccess.Read)] Stream input,
+            [Blob("images/uploads/{Id}")] CloudBlockBlob uploadedBlob,
             [Blob("images/handled/{Id}.img")] CloudBlockBlob outputBlob,
             [Blob("images/handled/{Id}_thumbnail.img")] CloudBlockBlob outputThumbnailBlob,
             [Table("images")]CloudTable imageTable,
@@ -21,19 +21,25 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Job
         {
             log.WriteLine("Got message from queue to process image: " + img.Source + ", with ID: " + img.RowKey);
 
-            using (var output = outputThumbnailBlob.OpenWrite())
+
+            using (var input = new MemoryStream())
             {
-                ProcessImage(img.ContentType, input, output, quality: 70, maxWidth: 150);
-                outputThumbnailBlob.Properties.ContentType = img.ContentType;
-                outputThumbnailBlob.Properties.CacheControl = "public, max-age=31536000"; // 1 year cache
+                uploadedBlob.DownloadToStream(input);
+                using (var output = outputThumbnailBlob.OpenWrite())
+                {
+                    ProcessImage(img.ContentType, input, output, quality: 70, maxWidth: 150);
+                    outputThumbnailBlob.Properties.ContentType = img.ContentType;
+                    outputThumbnailBlob.Properties.CacheControl = "public, max-age=31536000"; // 1 year cache
+                }
+                log.WriteLine("Created thumbnail for " + img.Id);
+                using (var output = outputBlob.OpenWrite())
+                {
+                    ProcessImage(img.ContentType, input, output, quality: 90, maxWidth: 1920);
+                    outputBlob.Properties.ContentType = img.ContentType;
+                    outputBlob.Properties.CacheControl = "public, max-age=31536000"; // 1 year cache
+                }
             }
-            log.WriteLine("Created thumbnail for " + img.Id);
-            using (var output = outputBlob.OpenWrite())
-            {
-                ProcessImage(img.ContentType, input, output, quality: 90, maxWidth: 1920);
-                outputBlob.Properties.ContentType = img.ContentType;
-                outputBlob.Properties.CacheControl = "public, max-age=31536000"; // 1 year cache
-            }
+            uploadedBlob.DeleteIfExists();
             log.WriteLine("Created full image for " + img.Id);
 
             // Insert to table storage
