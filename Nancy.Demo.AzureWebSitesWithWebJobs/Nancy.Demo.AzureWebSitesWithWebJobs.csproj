@@ -175,6 +175,7 @@
     <Compile Include="Api\Images\Models\UploadCompleteRequest.cs" />
     <Compile Include="Api\Images\Models\UploadRequest.cs" />
     <Compile Include="Api\Images\UploadModule.cs" />
+    <Compile Include="Hubs\ImagesHub.cs" />
     <Compile Include="Infrastructure\Bootstrapper.cs" />
     <Compile Include="Infrastructure\Config.cs" />
     <Compile Include="Infrastructure\Startup.cs" />
