@@ -41,7 +41,6 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
             InitTableStorage();
-
 #if !DEBUG
             pipelines.BeforeRequest.AddItemToStartOfPipeline(Nancy.Security.SecurityHooks.RequiresHttps(true));
 #endif
@@ -54,6 +53,17 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
             pipelines.AfterRequest += PostRequest;
 
             base.ApplicationStartup(container, pipelines);
+        }
+
+        protected override void ConfigureConventions(NancyConventions nancyConventions)
+        {
+            base.ConfigureConventions(nancyConventions);
+
+            nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("signalr"));
+            nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("App"));
+            nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("Img"));
+            nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("Content"));
+            nancyConventions.StaticContentsConventions.Add(StaticContentConventionBuilder.AddDirectory("Scripts"));
         }
 
         private void PostRequest(NancyContext ctx)

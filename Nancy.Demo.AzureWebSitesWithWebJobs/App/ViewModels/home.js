@@ -1,3 +1,4 @@
+/// <reference path="../../scripts/typings/signalr/images.d.ts" />
 /// <reference path="../../scripts/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../../scripts/typings/knockout.mapping/knockout.mapping.d.ts" />
 /// <reference path="../models/image.ts" />
@@ -15,19 +16,26 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
         }
         HomeViewModel.prototype.activate = function () {
             var that = this;
-            return http.get("/api/images/list/count").done(function (response) {
-                if (response.imageCount < 1)
-                    response.imageCount = 1;
-                var pages = Math.floor(response.imageCount / 12);
-                if (pages < 1)
-                    pages = 1;
-                var pageArray = [];
-                for (var i = 1; i <= pages; i++) {
-                    pageArray.push(i);
-                }
-                that.pages(pageArray);
-                that.imageCount(response.imageCount);
-                return that.getImages(0);
+            $.connection.hub.logging = true;
+            that.imageHub = $.connection.imagesHub;
+            that.imageHub.client.imageUploaded = function () {
+                that.getImages(0);
+            };
+            return $.connection.hub.start().done(function () {
+                return http.get("/api/images/list/count").done(function (response) {
+                    if (response.imageCount < 1)
+                        response.imageCount = 1;
+                    var pages = Math.floor(response.imageCount / 12);
+                    if (pages < 1)
+                        pages = 1;
+                    var pageArray = [];
+                    for (var i = 1; i <= pages; i++) {
+                        pageArray.push(i);
+                    }
+                    that.pages(pageArray);
+                    that.imageCount(response.imageCount);
+                    return that.getImages(0);
+                });
             });
         };
         HomeViewModel.prototype.compositionComplete = function () {

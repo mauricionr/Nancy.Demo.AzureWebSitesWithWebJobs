@@ -1,0 +1,3 @@
+﻿interface SignalR {
+    imagesHub: any;
+} 

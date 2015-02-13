@@ -1,4 +1,5 @@
-﻿/// <reference path="../../scripts/typings/bootstrap/bootstrap.d.ts" />
+﻿/// <reference path="../../scripts/typings/signalr/images.d.ts" />
+/// <reference path="../../scripts/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../../scripts/typings/knockout.mapping/knockout.mapping.d.ts" />
 /// <reference path="../models/image.ts" />
 
@@ -13,6 +14,7 @@ class HomeViewModel {
     imageCount: KnockoutObservable<number>;
     dropzoneLoaded: KnockoutObservable<boolean>;
     loading: KnockoutObservable<boolean>;
+    imageHub: any;
 
     constructor() {
         var that = this;
@@ -27,19 +29,26 @@ class HomeViewModel {
 
     activate(): JQueryPromise<any> {
         var that = this;
-        return http.get("/api/images/list/count").done(response => {
-            if (response.imageCount < 1)
-                response.imageCount = 1;
-            var pages = Math.floor(response.imageCount / 12);
-            if (pages < 1)
-                pages = 1;
-            var pageArray = [];
-            for (var i = 1; i <= pages; i++) {
-                pageArray.push(i);
-            }
-            that.pages(pageArray);
-            that.imageCount(response.imageCount);
-            return that.getImages(0);
+        $.connection.hub.logging = true;
+        that.imageHub = $.connection.imagesHub;
+        that.imageHub.client.imageUploaded = () => {
+            that.getImages(0);
+        };
+        return $.connection.hub.start().done(() => {
+            return http.get("/api/images/list/count").done(response => {
+                if (response.imageCount < 1)
+                    response.imageCount = 1;
+                var pages = Math.floor(response.imageCount / 12);
+                if (pages < 1)
+                    pages = 1;
+                var pageArray = [];
+                for (var i = 1; i <= pages; i++) {
+                    pageArray.push(i);
+                }
+                that.pages(pageArray);
+                that.imageCount(response.imageCount);
+                return that.getImages(0);
+            });
         });
     }
 
