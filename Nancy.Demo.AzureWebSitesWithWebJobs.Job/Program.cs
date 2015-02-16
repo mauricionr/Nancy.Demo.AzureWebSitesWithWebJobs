@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using System.Configuration;
+using Microsoft.Azure.WebJobs;
 
 namespace Nancy.Demo.AzureWebSitesWithWebJobs.Job
 {
@@ -6,7 +7,11 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Job
     {
         static void Main()
         {
-            var host = new JobHost();
+            var jobHostConfiguration = new JobHostConfiguration
+            {
+                ServiceBusConnectionString = ConfigurationManager.ConnectionStrings["servicebus"].ConnectionString
+            };
+            var host = new JobHost(jobHostConfiguration);
             host.RunAndBlock();
         }
     }

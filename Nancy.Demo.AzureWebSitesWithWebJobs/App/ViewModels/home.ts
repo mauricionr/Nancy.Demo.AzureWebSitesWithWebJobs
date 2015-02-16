@@ -31,8 +31,17 @@ class HomeViewModel {
         var that = this;
         $.connection.hub.logging = true;
         that.imageHub = $.connection.imagesHub;
+        that.imageHub.client.ping = () => {
+            console.log(new Date().toJSON());
+        };
         that.imageHub.client.imageUploaded = () => {
+            console.log("Server requesting refresh of images");
             that.getImages(0);
+        };
+        that.imageHub.client.disconnected = () => {
+            setTimeout(() => {
+                $.connection.hub.start();
+            }, 5000); // Restart connection after 5 seconds.
         };
         return $.connection.hub.start().done(() => {
             return http.get("/api/images/list/count").done(response => {
@@ -60,6 +69,9 @@ class HomeViewModel {
                 return;
             that.dropzoneLoaded(true);
         });
+        setTimeout(() => {
+            that.imageHub.server.informClientsOfNewImage();
+        }, 5000); // Restart connection after 5 seconds.
     }
 
     fileLoaded(file: any, data: any): void {

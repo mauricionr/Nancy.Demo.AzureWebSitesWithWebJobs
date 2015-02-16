@@ -18,8 +18,17 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
             var that = this;
             $.connection.hub.logging = true;
             that.imageHub = $.connection.imagesHub;
+            that.imageHub.client.ping = function () {
+                console.log(new Date().toJSON());
+            };
             that.imageHub.client.imageUploaded = function () {
+                console.log("Server requesting refresh of images");
                 that.getImages(0);
+            };
+            that.imageHub.client.disconnected = function () {
+                setTimeout(function () {
+                    $.connection.hub.start();
+                }, 5000); // Restart connection after 5 seconds.
             };
             return $.connection.hub.start().done(function () {
                 return http.get("/api/images/list/count").done(function (response) {
@@ -46,6 +55,9 @@ define(["require", "exports", 'plugins/router', 'plugins/http'], function (requi
                     return;
                 that.dropzoneLoaded(true);
             });
+            setTimeout(function () {
+                that.imageHub.server.informClientsOfNewImage();
+            }, 5000); // Restart connection after 5 seconds.
         };
         HomeViewModel.prototype.fileLoaded = function (file, data) {
             var that = this;

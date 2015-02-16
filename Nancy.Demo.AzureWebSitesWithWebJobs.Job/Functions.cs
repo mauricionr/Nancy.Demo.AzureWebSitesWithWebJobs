@@ -4,6 +4,7 @@ using ImageProcessor;
 using ImageProcessor.Imaging;
 using ImageProcessor.Imaging.Formats;
 using Microsoft.Azure.WebJobs;
+using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -17,6 +18,7 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Job
             [Blob("images/handled/{Id}.img")] CloudBlockBlob outputBlob,
             [Blob("images/handled/{Id}_thumbnail.img")] CloudBlockBlob outputThumbnailBlob,
             [Table("images")]CloudTable imageTable,
+            [ServiceBus("images")] out string message,
             TextWriter log)
         {
             log.WriteLine("Got message from queue to process image: " + img.Source + ", with ID: " + img.RowKey);
@@ -39,7 +41,6 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Job
                     outputBlob.Properties.CacheControl = "public, max-age=31536000"; // 1 year cache
                 }
             }
-            uploadedBlob.DeleteIfExists();
             log.WriteLine("Created full image for " + img.Id);
 
             // Insert to table storage
@@ -49,6 +50,19 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Job
             var opp = TableOperation.Insert(img);
             imageTable.Execute(opp);
             log.WriteLine("Inserted outputted image for " + img.Id);
+
+            //using (var m = new MemoryStream())
+            //{
+            //    using (var t = new StreamWriter(m))
+            //    {
+            //        t.Write("ImageUploaded");
+            //        t.Flush();
+            //    }
+            //    message = new BrokeredMessage(m);
+            //}
+            message = "ImageUploaded";
+            uploadedBlob.DeleteIfExists();
+            log.WriteLine("Message to service bus assigned");
         }
 
         private static void ProcessImage(string contentType, Stream input, Stream output, int quality, int maxWidth)

@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI.WebControls.WebParts;
+using Microsoft.AspNet.SignalR;
+using Microsoft.ServiceBus;
+using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Shared.Protocol;
@@ -16,13 +20,28 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
 {
     public class Bootstrapper : Nancy.DefaultNancyBootstrapper
     {
+        private readonly TinyIoCContainer _container;
+        private readonly TinyIoCDependencyResolver _dependencyResolver;
         private readonly CloudBlobClient _blobClient;
         private readonly CloudTable _table;
         private readonly CloudBlobContainer _blobContainer;
         private readonly CloudQueue _queue;
+        private readonly NamespaceManager _namespaceManager;
+        private readonly SubscriptionClient _subscriptionClient;
+        private BusListener _busListener;
 
-        public Bootstrapper()
+        public TinyIoCDependencyResolver DependencyResolver { get { return _dependencyResolver; } }
+
+        public Bootstrapper(TinyIoCContainer ioc)
         {
+            _container = ioc;
+            _dependencyResolver = new TinyIoCDependencyResolver(_container);
+
+            // service bus
+            _namespaceManager = NamespaceManager.CreateFromConnectionString(ConfigurationManager.ConnectionStrings["servicebus"].ConnectionString);
+            _subscriptionClient = SubscriptionClient.CreateFromConnectionString(ConfigurationManager.ConnectionStrings["servicebus"].ConnectionString, "images", "nancysubscription", ReceiveMode.ReceiveAndDelete);
+            
+            // storage
             var storage = Microsoft.WindowsAzure.Storage.CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["storage"].ConnectionString);
 
             // Blob
@@ -38,21 +57,30 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
             _queue = queueClient.GetQueueReference("images");
         }
 
+        protected override TinyIoCContainer GetApplicationContainer()
+        {
+            return _container;
+        }
+
         protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
-            InitTableStorage();
-#if !DEBUG
-            pipelines.BeforeRequest.AddItemToStartOfPipeline(Nancy.Security.SecurityHooks.RequiresHttps(true));
-#endif
             container.Register<Repositories.ImageRepository>();
             container.Register<Infrastructure.Config>();
             container.Register(_blobContainer);
             container.Register(_table);
             container.Register(_queue);
+            container.Register(_subscriptionClient);
+
+            InitTableStorage();
+            InitServiceBus();
+#if !DEBUG
+            pipelines.BeforeRequest.AddItemToStartOfPipeline(Nancy.Security.SecurityHooks.RequiresHttps(true));
+#endif
 
             pipelines.AfterRequest += PostRequest;
 
-            base.ApplicationStartup(container, pipelines);
+            _busListener = _container.Resolve<Infrastructure.BusListener>();
+            _busListener.Init();
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)
@@ -93,6 +121,14 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
                 ExposedHeaders = new List<string>() { "*" },
                 MaxAgeInSeconds = 1800 // 30 minutes
             });
+        }
+
+        private void InitServiceBus()
+        {
+            if (!_namespaceManager.TopicExists("images"))
+                _namespaceManager.CreateTopic("images");
+            if (!_namespaceManager.SubscriptionExists("images", "nancysubscription"))
+                _namespaceManager.CreateSubscription("images", "nancysubscription");
         }
     }
 }
