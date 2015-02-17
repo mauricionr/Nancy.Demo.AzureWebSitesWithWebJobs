@@ -8,23 +8,23 @@ using System.Web;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.ServiceBus.Messaging;
-using Nancy.Demo.AzureWebSitesWithWebJobs.Factories;
+using Nancy.Demo.AzureWebSitesWithWebJobs.Hubs;
 
 namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
 {
     internal class BusListener
     {
         private readonly SubscriptionClient _subscriptionClient;
-        private readonly HubContextsFactory _hubContextsFactory;
+        private readonly IHubContext _imageHub;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
-        public BusListener(SubscriptionClient subscriptionClient, Factories.HubContextsFactory hubContextsFactory)
+        public BusListener(SubscriptionClient subscriptionClient, IHubContext imageHub)
         {
             if (subscriptionClient == null) throw new ArgumentNullException("subscriptionClient");
-            if (hubContextsFactory == null) throw new ArgumentNullException("hubContextsFactory");
+            if (imageHub == null) throw new ArgumentNullException("imageHub");
 
             _subscriptionClient = subscriptionClient;
-            _hubContextsFactory = hubContextsFactory;
+            _imageHub = imageHub;
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
@@ -57,16 +57,14 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
         private void PingClients()
         {
             Debug.WriteLine("Pinging clients...");
-            var hub = _hubContextsFactory.GetContext();
-            hub.Clients.All.ping();
+            _imageHub.Clients.All.ping();
             Debug.WriteLine("Clients pinged...");
         }
 
         private void InformClientsOfNewImage()
         {
             Debug.WriteLine("Informing clients of new image...");
-            var hub = _hubContextsFactory.GetContext();
-            hub.Clients.All.imageUploaded();
+            _imageHub.Clients.All.imageUploaded();
             Debug.WriteLine("Clients informed");
         }
     }

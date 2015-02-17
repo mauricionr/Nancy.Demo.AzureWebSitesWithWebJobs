@@ -34,6 +34,9 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
             {
                 Bootstrapper = bootstrapper
             };
+
+            GlobalHost.DependencyResolver = bootstrapper.DependencyResolver;
+
             app.MapSignalR(hubConfiguration);
             app.UseNancy(nancyOptions);
         }

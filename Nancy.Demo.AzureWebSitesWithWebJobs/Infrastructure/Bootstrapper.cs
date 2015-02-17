@@ -70,6 +70,11 @@ namespace Nancy.Demo.AzureWebSitesWithWebJobs.Infrastructure
             container.Register(_table);
             container.Register(_queue);
             container.Register(_subscriptionClient);
+            container.Register((c, p) =>
+            {
+                var result = GlobalHost.ConnectionManager.GetHubContext<Hubs.ImagesHub>();
+                return result;
+            });
 
             InitTableStorage();
             InitServiceBus();
