@@ -2,6 +2,9 @@
 
 **Nancy running as an Azure Website using WebJobs**
 
+###Example site running on
+####https://nancydemoazurewebsiteswithwebjobs.azurewebsites.net/
+
 ###In order to use this project you need to:
 1. Log into your Azure account and create a new storage data service and service bus namespace
 2. Edit the web- and app.config files. Add your own Azure storage account
@@ -27,6 +30,6 @@ Example of connection string:
   <add name="servicebus" connectionString="Endpoint=sb://servicebusnamespace.servicebus.windows.net/;SharedAccessKeyName=username;SharedAccessKey=key" />
 </connectionStrings>
 <appSettings>
-  <add key="storagecdn" value="" />
+  <add key="storagecdn" value="mycdn.domain.net" />
 </appSettings>
 ```
